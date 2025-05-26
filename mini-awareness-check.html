@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Awareness Check</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+        const { Eye, TrendingUp, AlertTriangle, ArrowRight, Brain, Search } = lucide;
+
+        const MiniAwarenessAssessment = () => {
+            const [currentQuestion, setCurrentQuestion] = useState(0);
+            const [answers, setAnswers] = useState([]);
+            const [showResults, setShowResults] = useState(false);
+
+            const questions = [
+                {
+                    question: "When you get angry or frustrated, how well do you understand what triggered it?",
+                    options: [
+                        { text: "I always know exactly what set me off and why", value: 4 },
+                        { text: "I usually understand my triggers pretty well", value: 3 },
+                        { text: "Sometimes I figure it out, sometimes I don't", value: 2 },
+                        { text: "I'm often surprised by my own reactions", value: 1 }
+                    ]
+                },
+                {
+                    question: "How accurate do you think others' feedback about you typically is?",
+                    options: [
+                        { text: "Very accurate - they see things I miss about myself", value: 4 },
+                        { text: "Mostly accurate - they have valid points", value: 3 },
+                        { text: "Sometimes accurate - depends on the person", value: 2 },
+                        { text: "Usually wrong - they don't really know me", value: 1 }
+                    ]
+                },
+                {
+                    question: "When you make a mistake, how quickly do you recognize your role in it?",
+                    options: [
+                        { text: "Immediately - I take ownership right away", value: 4 },
+                        { text: "Pretty quickly - I reflect and see my part", value: 3 },
+                        { text: "Eventually - it takes me some time to see it", value: 2 },
+                        { text: "I often don't see how it was my fault", value: 1 }
+                    ]
+                },
+                {
+                    question: "How well do you understand your natural strengths and weaknesses?",
+                    options: [
+                        { text: "Very well - I know exactly where I excel and struggle", value: 4 },
+                        { text: "Pretty well - I have good insight into myself", value: 3 },
+                        { text: "Somewhat - I understand some aspects of myself", value: 2 },
+                        { text: "Not very well - I'm still figuring myself out", value: 1 }
+                    ]
+                }
+            ];
+
+            const handleAnswer = (value) => {
+                const newAnswers = [...answers, value];
+                setAnswers(newAnswers);
+
+                if (currentQuestion < questions.length - 1) {
+                    setCurrentQuestion(currentQuestion + 1);
+                } else {
+                    setShowResults(true);
+                }
+            };
+
+            const calculateScore = () => {
+                const total = answers.reduce((sum, answer) => sum + answer, 0);
+                const percentage = Math.round((total / 16) * 100);
+                return { total, percentage };
+            };
+
+            const getResultData = () => {
+                const { total, percentage } = calculateScore();
+
+                if (total >= 14) {
+                    return {
+                        level: "HIGHLY SELF-AWARE",
+                        color: "text-green-600",
+                        bgColor: "bg-green-50",
+                        borderColor: "border-green-300",
+                        icon: Eye,
+                        message: "Impressive! You have exceptional self-awareness.",
+                        insight: "Your self-awareness is a major strength. But how does it connect with your discipline, motivation, and other key areas?",
+                        cta: "See Your Complete Mastery Profile"
+                    };
+                } else if (total >= 11) {
+                    return {
+                        level: "GOOD INSIGHT",
+                        color: "text-blue-600",
+                        bgColor: "bg-blue-50",
+                        borderColor: "border-blue-300",
+                        icon: Brain,
+                        message: "Solid foundation! You understand yourself reasonably well.",
+                        insight: "Self-awareness is great, but it works best when combined with self-control and self-direction. Want to see how all the pieces fit?",
+                        cta: "Discover Your Growth Areas"
+                    };
+                } else if (total >= 8) {
+                    return {
+                        level: "DEVELOPING AWARENESS",
+                        color: "text-yellow-600",
+                        bgColor: "bg-yellow-50",
+                        borderColor: "border-yellow-300",
+                        icon: Search,
+                        message: "You're on the right track but have significant blind spots.",
+                        insight: "Limited self-awareness often impacts discipline, relationships, and decision-making. The full assessment reveals exactly where to focus.",
+                        cta: "Identify Your Blind Spots"
+                    };
+                } else {
+                    return {
+                        level: "MAJOR BLIND SPOTS",
+                        color: "text-red-600",
+                        bgColor: "bg-red-50",
+                        borderColor: "border-red-300",
+                        icon: AlertTriangle,
+                        message: "Your self-awareness needs immediate attention.",
+                        insight: "Without self-awareness, it's nearly impossible to improve other areas. The complete assessment shows you exactly where to start.",
+                        cta: "Get Your Awareness Action Plan"
+                    };
+                }
+            };
+
+            const resetAssessment = () => {
+                setCurrentQuestion(0);
+                setAnswers([]);
+                setShowResults(false);
+            };
+
+            if (showResults) {
+                const result = getResultData();
+                const { percentage } = calculateScore();
+                const IconComponent = result.icon;
+
+                return (
+                    <div className="max-w-2xl mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <div className={`${result.bgColor} ${result.borderColor} border rounded-lg p-6`}>
+                            <div className="flex items-center gap-3 mb-4">
+                                <IconComponent className={`${result.color} w-8 h-8`} />
+                                <div>
+                                    <div className={`${result.color} text-2xl font-bold`}>
+                                        {percentage}% AWARENESS SCORE
+                                    </div>
+                                    <div className={`${result.color} text-lg font-semibold`}>
+                                        {result.level}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p className="text-gray-700 text-lg mb-4">
+                                {result.message}
+                            </p>
+
+                            <div className="bg-white rounded-lg p-4 mb-6 border border-gray-200">
+                                <p className="text-gray-700 font-medium mb-3">
+                                    🧠 <strong>Key Insight:</strong>
+                                </p>
+                                <p className="text-gray-600">
+                                    {result.insight}
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row gap-3">
+                                <button
+                                    onClick={() => window.open('./self-mastery-assessment.html', '_blank')}
+                                    className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                                >
+                                    {result.cta}
+                                    <ArrowRight size={16} />
+                                </button>
+                                
+                                <button
+                                    onClick={resetAssessment}
+                                    className="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                >
+                                    Retake
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="mt-4 text-center">
+                            <p className="text-sm text-gray-500">
+                                Self-awareness is pillar 4 of 8 in the complete Self Mastery School framework
+                            </p>
+                        </div>
+                    </div>
+                );
+            }
+
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+
+            return (
+                <div className="max-w-2xl mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+                    <div className="text-center mb-6">
+                        <div className="flex items-center justify-center gap-2 mb-2">
+                            <Eye className="w-6 h-6 text-blue-600" />
+                            <h3 className="text-xl font-bold text-gray-800">
+                                Quick Awareness Check
+                            </h3>
+                        </div>
+                        <p className="text-gray-600">
+                            How self-aware are you really? 4 honest questions.
+                        </p>
+                    </div>
+
+                    <div className="mb-6">
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm text-gray-500">
+                                Question {currentQuestion + 1} of {questions.length}
+                            </span>
+                            <span className="text-sm font-semibold text-blue-600">
+                                {Math.round(progress)}%
+                            </span>
+                        </div>
+                        
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${progress}%` }}
+                            ></div>
+                        </div>
+                    </div>
+
+                    <div className="mb-8">
+                        <h4 className="text-lg font-semibold text-gray-800 mb-6">
+                            {questions[currentQuestion].question}
+                        </h4>
+
+                        <div className="space-y-3">
+                            {questions[currentQuestion].options.map((option, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => handleAnswer(option.value)}
+                                    className="w-full text-left p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
+                                >
+                                    <span className="text-gray-700">{option.text}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="text-center text-xs text-gray-500">
+                        Part of the Self Mastery School framework
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<MiniAwarenessAssessment />, document.getElementById('root'));
+    </script>
+</body>
+</html>
