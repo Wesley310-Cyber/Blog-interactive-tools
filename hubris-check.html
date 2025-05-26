@@ -1,0 +1,284 @@
+hubris-check.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hubris Check - Interactive Assessment</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+        const { AlertTriangle, CheckCircle, XCircle, RotateCcw } = lucide;
+
+        const HubrisCheckTool = () => {
+            const [currentQuestion, setCurrentQuestion] = useState(0);
+            const [answers, setAnswers] = useState({});
+            const [showResults, setShowResults] = useState(false);
+
+            const questions = [
+                {
+                    id: 1,
+                    question: "When was the last time you actively sought feedback on your work?",
+                    options: [
+                        { text: "Within the last week", value: 0 },
+                        { text: "Within the last month", value: 1 },
+                        { text: "A few months ago", value: 2 },
+                        { text: "I can't remember", value: 3 }
+                    ]
+                },
+                {
+                    id: 2,
+                    question: "How do you feel when someone challenges your business approach?",
+                    options: [
+                        { text: "Curious - I want to understand their perspective", value: 0 },
+                        { text: "Defensive but willing to listen", value: 1 },
+                        { text: "Annoyed - they don't understand my vision", value: 2 },
+                        { text: "Dismissed - I know what works", value: 3 }
+                    ]
+                },
+                {
+                    id: 3,
+                    question: "How often do you research what your competitors are doing?",
+                    options: [
+                        { text: "Weekly - I stay on top of industry trends", value: 0 },
+                        { text: "Monthly - I check in regularly", value: 1 },
+                        { text: "Rarely - I focus on my own business", value: 2 },
+                        { text: "Never - I don't worry about competition", value: 3 }
+                    ]
+                },
+                {
+                    id: 4,
+                    question: "When clients give you constructive criticism, you:",
+                    options: [
+                        { text: "Thank them and immediately make improvements", value: 0 },
+                        { text: "Consider their points and make changes when valid", value: 1 },
+                        { text: "Listen politely but rarely change anything", value: 2 },
+                        { text: "Feel they don't appreciate your expertise", value: 3 }
+                    ]
+                },
+                {
+                    id: 5,
+                    question: "How often do you invest in learning new skills?",
+                    options: [
+                        { text: "Constantly - I'm always learning something new", value: 0 },
+                        { text: "Regularly - I set aside time each month", value: 1 },
+                        { text: "Occasionally - when I feel I need to", value: 2 },
+                        { text: "Rarely - I know what I need to know", value: 3 }
+                    ]
+                },
+                {
+                    id: 6,
+                    question: "When you make a mistake in business, you:",
+                    options: [
+                        { text: "Analyze it deeply to understand what went wrong", value: 0 },
+                        { text: "Learn from it and move on", value: 1 },
+                        { text: "Try not to think about it too much", value: 2 },
+                        { text: "Blame external factors or bad luck", value: 3 }
+                    ]
+                },
+                {
+                    id: 7,
+                    question: "How do you view newer entrepreneurs in your space?",
+                    options: [
+                        { text: "Potential collaborators and sources of fresh ideas", value: 0 },
+                        { text: "Interesting to watch and learn from", value: 1 },
+                        { text: "Not a threat - they lack experience", value: 2 },
+                        { text: "Naive - they'll learn the hard way", value: 3 }
+                    ]
+                },
+                {
+                    id: 8,
+                    question: "When was the last time you changed a core part of how you do business?",
+                    options: [
+                        { text: "Recently - I'm always optimizing", value: 0 },
+                        { text: "This year - I adapt when needed", value: 1 },
+                        { text: "It's been over a year", value: 2 },
+                        { text: "If it's not broken, don't fix it", value: 3 }
+                    ]
+                }
+            ];
+
+            const handleAnswer = (value) => {
+                const newAnswers = { ...answers, [currentQuestion]: value };
+                setAnswers(newAnswers);
+
+                if (currentQuestion < questions.length - 1) {
+                    setCurrentQuestion(currentQuestion + 1);
+                } else {
+                    setShowResults(true);
+                }
+            };
+
+            const calculateScore = () => {
+                return Object.values(answers).reduce((sum, value) => sum + value, 0);
+            };
+
+            const getResultData = () => {
+                const score = calculateScore();
+                const maxScore = questions.length * 3;
+
+                if (score <= 8) {
+                    return {
+                        level: "HUNGRY & HUMBLE",
+                        color: "text-green-600",
+                        bgColor: "bg-green-50",
+                        borderColor: "border-green-200",
+                        icon: CheckCircle,
+                        message: "You're staying sharp! Your mindset is focused on continuous growth and learning. Keep this energy.",
+                        advice: [
+                            "You're on the right track - maintain this hunger",
+                            "Consider mentoring others to stay connected to beginner's mind",
+                            "Keep challenging yourself with new goals and skills"
+                        ]
+                    };
+                } else if (score <= 16) {
+                    return {
+                        level: "COMFORT ZONE ALERT",
+                        color: "text-yellow-600",
+                        bgColor: "bg-yellow-50",
+                        borderColor: "border-yellow-200",
+                        icon: AlertTriangle,
+                        message: "You're getting comfortable. Not necessarily bad, but watch for signs of complacency creeping in.",
+                        advice: [
+                            "Actively seek out uncomfortable challenges",
+                            "Schedule regular check-ins with mentors or peers",
+                            "Set aside time each week for learning something new"
+                        ]
+                    };
+                } else {
+                    return {
+                        level: "HUBRIS DANGER ZONE",
+                        color: "text-red-600",
+                        bgColor: "bg-red-50",
+                        borderColor: "border-red-200",
+                        icon: XCircle,
+                        message: "Warning: You might be too comfortable. This attitude has killed more businesses than market crashes.",
+                        advice: [
+                            "Immediately seek feedback from trusted sources",
+                            "Research what your competition is doing differently",
+                            "Find a mentor or coach who will challenge you",
+                            "Set humbling goals that push you out of your comfort zone"
+                        ]
+                    };
+                }
+            };
+
+            const resetQuiz = () => {
+                setCurrentQuestion(0);
+                setAnswers({});
+                setShowResults(false);
+            };
+
+            if (showResults) {
+                const result = getResultData();
+                const IconComponent = result.icon;
+
+                return (
+                    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+                        <div className={`${result.bgColor} ${result.borderColor} border rounded-lg p-6`}>
+                            <div className="flex items-center gap-3 mb-4">
+                                <IconComponent className={`${result.color} w-8 h-8`} />
+                                <div>
+                                    <h2 className={`${result.color} text-2xl font-bold`}>
+                                        {result.level}
+                                    </h2>
+                                    <p className="text-gray-600 text-sm">
+                                        Your Hubris Check Results
+                                    </p>
+                                </div>
+                            </div>
+
+                            <p className="text-gray-700 mb-6 text-lg">
+                                {result.message}
+                            </p>
+
+                            <div className="mb-6">
+                                <h3 className="font-semibold text-gray-800 mb-3">Next Steps:</h3>
+                                <ul className="space-y-2">
+                                    {result.advice.map((advice, index) => (
+                                        <li key={index} className="flex items-start gap-2">
+                                            <span className="text-gray-400 mt-1">•</span>
+                                            <span className="text-gray-700">{advice}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={resetQuiz}
+                                    className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                                >
+                                    <RotateCcw size={16} />
+                                    Take Again
+                                </button>
+                                
+                                <button
+                                    onClick={() => window.open('https://twitter.com/intent/tweet?text=I just took the Hubris Check and got: ' + result.level, '_blank')}
+                                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                                >
+                                    Share Results
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+
+            return (
+                <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+                    <div className="mb-6">
+                        <div className="flex justify-between items-center mb-2">
+                            <h2 className="text-2xl font-bold text-gray-800">Hubris Check</h2>
+                            <span className="text-sm text-gray-500">
+                                {currentQuestion + 1} of {questions.length}
+                            </span>
+                        </div>
+                        
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${progress}%` }}
+                            ></div>
+                        </div>
+                    </div>
+
+                    <div className="mb-8">
+                        <h3 className="text-xl font-semibold text-gray-800 mb-6">
+                            {questions[currentQuestion].question}
+                        </h3>
+
+                        <div className="space-y-3">
+                            {questions[currentQuestion].options.map((option, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => handleAnswer(option.value)}
+                                    className="w-full text-left p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
+                                >
+                                    <span className="text-gray-700">{option.text}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="text-center text-sm text-gray-500">
+                        Be honest with yourself - this assessment only works if you are.
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<HubrisCheckTool />, document.getElementById('root'));
+    </script>
+</body>
+</html>
