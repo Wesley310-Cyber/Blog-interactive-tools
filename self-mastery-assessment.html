@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Self Mastery School Assessment</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+        const { GraduationCap, Award, AlertTriangle, BookOpen, Target, TrendingUp, Mail, Download } = lucide;
+
+        const SelfMasteryAssessment = () => {
+            const [currentStep, setCurrentStep] = useState('intro');
+            const [currentQuestion, setCurrentQuestion] = useState(0);
+            const [answers, setAnswers] = useState({});
+            const [userInfo, setUserInfo] = useState({
+                name: '',
+                email: '',
+                age: '',
+                currentGoal: ''
+            });
+
+            const pillars = [
+                { name: 'Self-Discipline', key: 'discipline' },
+                { name: 'Self-Education', key: 'education' },
+                { name: 'Self-Control', key: 'control' },
+                { name: 'Self-Awareness', key: 'awareness' },
+                { name: 'Self-Improvement', key: 'improvement' },
+                { name: 'Self-Motivation', key: 'motivation' },
+                { name: 'Self-Projection', key: 'projection' },
+                { name: 'Self-Direction', key: 'direction' }
+            ];
+
+            const questions = [
+                // Self-Discipline (2 questions)
+                {
+                    pillar: 'discipline',
+                    question: "When your alarm goes off in the morning, what typically happens?",
+                    options: [
+                        { text: "I get up immediately, every time", value: 5 },
+                        { text: "I get up within 5 minutes, most days", value: 4 },
+                        { text: "I hit snooze once or twice, then get up", value: 2 },
+                        { text: "I struggle to get out of bed and often run late", value: 1 }
+                    ]
+                },
+                {
+                    pillar: 'discipline',
+                    question: "How consistently do you follow through on commitments you make to yourself?",
+                    options: [
+                        { text: "I always keep my word to myself", value: 5 },
+                        { text: "I follow through most of the time", value: 4 },
+                        { text: "I'm inconsistent - some goals I hit, others I don't", value: 2 },
+                        { text: "I often make plans but struggle to stick with them", value: 1 }
+                    ]
+                },
+                // Self-Education (2 questions)
+                {
+                    pillar: 'education',
+                    question: "How much time do you spend learning new skills each week?",
+                    options: [
+                        { text: "5+ hours - I'm constantly learning", value: 5 },
+                        { text: "2-4 hours - I regularly invest in learning", value: 4 },
+                        { text: "30 minutes to 1 hour - I squeeze it in when I can", value: 2 },
+                        { text: "Very little - I mostly consume entertainment", value: 1 }
+                    ]
+                },
+                {
+                    pillar: 'education',
+                    question: "When facing a challenge, what's your first instinct?",
+                    options: [
+                        { text: "Research solutions and learn what I need to know", value: 5 },
+                        { text: "Ask for advice from people who've solved similar problems", value: 4 },
+                        { text: "Try different approaches until something works", value: 2 },
+                        { text: "Hope it resolves itself or ask someone else to handle it", value: 1 }
+                    ]
+                },
+                // Self-Control (2 questions)
+                {
+                    pillar: 'control',
+                    question: "How do you handle your money?",
+                    options: [
+                        { text: "I budget carefully and stick to it", value: 5 },
+                        { text: "I generally save but sometimes overspend", value: 4 },
+                        { text: "I try to save but often buy things impulsively", value: 2 },
+                        { text: "I spend what I have and worry about money later", value: 1 }
+                    ]
+                },
+                {
+                    pillar: 'control',
+                    question: "When someone says something that angers you, you typically:",
+                    options: [
+                        { text: "Take a moment to think before responding calmly", value: 5 },
+                        { text: "Feel the anger but control how I express it", value: 4 },
+                        { text: "React emotionally but try to recover quickly", value: 2 },
+                        { text: "Say what I'm thinking without much filter", value: 1 }
+                    ]
+                },
+                // Self-Awareness (2 questions)
+                {
+                    pillar: 'awareness',
+                    question: "How well do you understand your emotional patterns and triggers?",
+                    options: [
+                        { text: "I know exactly what sets me off and why", value: 5 },
+                        { text: "I recognize my patterns and work to improve them", value: 4 },
+                        { text: "I notice some patterns but don't always understand them", value: 2 },
+                        { text: "I'm often surprised by my own reactions", value: 1 }
+                    ]
+                },
+                {
+                    pillar: 'awareness',
+                    question: "How honestly can you assess your own strengths and weaknesses?",
+                    options: [
+                        { text: "Very honestly - I know where I excel and where I struggle", value: 5 },
+                        { text: "Pretty well - I have good self-insight", value: 4 },
+                        { text: "Somewhat - I understand some aspects of myself", value: 2 },
+                        { text: "Not very well - I struggle with self-evaluation", value: 1 }
+                    ]
+                },
+                // Self-Improvement (2 questions)
+                {
+                    pillar: 'improvement',
+                    question: "How do you typically respond to feedback or criticism?",
+                    options: [
+                        { text: "I welcome it and actively seek ways to improve", value: 5 },
+                        { text: "I listen carefully and usually make changes", value: 4 },
+                        { text: "I listen but sometimes get defensive", value: 2 },
+                        { text: "I often take it personally and resist change", value: 1 }
+                    ]
+                },
+                {
+                    pillar: 'improvement',
+                    question: "When you fail or make a mistake, what happens next?",
+                    options: [
+                        { text: "I analyze what went wrong and develop a better approach", value: 5 },
+                        { text: "I learn from it and try again with adjustments", value: 4 },
+                        { text: "I feel bad for a while but eventually move on", value: 2 },
+                        { text: "I tend to avoid similar situations in the future", value: 1 }
+                    ]
+                },
+                // Self-Motivation (2 questions)
+                {
+                    pillar: 'motivation',
+                    question: "What drives you to work hard?",
+                    options: [
+                        { text: "Clear personal goals that excite me", value: 5 },
+                        { text: "A mix of personal goals and external expectations", value: 4 },
+                        { text: "Mostly external pressure from others", value: 2 },
+                        { text: "I struggle to find consistent motivation", value: 1 }
+                    ]
+                },
+                {
+                    pillar: 'motivation',
+                    question: "When things get difficult, how do you maintain momentum?",
+                    options: [
+                        { text: "I remind myself why the goal matters and push through", value: 5 },
+                        { text: "I adjust my approach but stay committed to the outcome", value: 4 },
+                        { text: "I take breaks and hope motivation returns", value: 2 },
+                        { text: "I often lose steam and abandon the goal", value: 1 }
+                    ]
+                },
+                // Self-Projection (2 questions)
+                {
+                    pillar: 'projection',
+                    question: "How intentional are you about your appearance and presentation?",
+                    options: [
+                        { text: "Very intentional - I dress and present myself strategically", value: 5 },
+                        { text: "Fairly intentional - I care about how I come across", value: 4 },
+                        { text: "Somewhat - I make an effort for important occasions", value: 2 },
+                        { text: "Not very - I don't think much about how others perceive me", value: 1 }
+                    ]
+                },
+                {
+                    pillar: 'projection',
+                    question: "How do you communicate in professional or important situations?",
+                    options: [
+                        { text: "Confidently and clearly, with good eye contact", value: 5 },
+                        { text: "Generally well, though I sometimes lack confidence", value: 4 },
+                        { text: "Adequately, but I know I could improve", value: 2 },
+                        { text: "I often struggle to express myself effectively", value: 1 }
+                    ]
+                },
+                // Self-Direction (2 questions)
+                {
+                    pillar: 'direction',
+                    question: "How clear are you about what you want to achieve in life?",
+                    options: [
+                        { text: "Crystal clear - I have specific goals and a plan", value: 5 },
+                        { text: "Pretty clear - I know my general direction", value: 4 },
+                        { text: "Somewhat clear - I have ideas but they're not concrete", value: 2 },
+                        { text: "Unclear - I'm still figuring out what I want", value: 1 }
+                    ]
+                },
+                {
+                    pillar: 'direction',
+                    question: "Who has the most influence over your major life decisions?",
+                    options: [
+                        { text: "Me - I make my own choices based on my values", value: 5 },
+                        { text: "Mostly me, but I value input from trusted advisors", value: 4 },
+                        { text: "A mix of my own thoughts and others' expectations", value: 2 },
+                        { text: "Others - family, friends, or society heavily influence me", value: 1 }
+                    ]
+                }
+            ];
+
+            const handleAnswer = (value) => {
+                const question = questions[currentQuestion];
+                const newAnswers = { ...answers };
+                
+                if (!newAnswers[question.pillar]) {
+                    newAnswers[question.pillar] = [];
+                }
+                
+                newAnswers[question.pillar].push(value);
+                setAnswers(newAnswers);
+
+                if (currentQuestion < questions.length - 1) {
+                    setCurrentQuestion(currentQuestion + 1);
+                } else {
+                    setCurrentStep('info');
+                }
+            };
+
+            const calculateGrades = () => {
+                const grades = {};
+                let totalGPA = 0;
+                
+                pillars.forEach(pillar => {
+                    const pillarAnswers = answers[pillar.key] || [];
+                    const average = pillarAnswers.reduce((sum, val) => sum + val, 0) / pillarAnswers.length;
+                    const percentage = (average / 5) * 100;
+                    
+                    let letterGrade;
+                    if (percentage >= 90) letterGrade = 'A';
+                    else if (percentage >= 80) letterGrade = 'B';
+                    else if (percentage >= 70) letterGrade = 'C';
+                    else if (percentage >= 60) letterGrade = 'D';
+                    else letterGrade = 'F';
+                    
+                    grades[pillar.key] = {
+                        name: pillar.name,
+                        score: average,
+                        percentage: Math.round(percentage),
+                        letter: letterGrade
+                    };
+                    
+                    totalGPA += average;
+                });
+                
+                const overallGPA = (totalGPA / pillars.length).toFixed(2);
+                return { grades, overallGPA };
+            };
+
+            const getPersonalizedPath = () => {
+                const { grades } = calculateGrades();
+                const weakestAreas = Object.entries(grades)
+                    .sort((a, b) => a[1].score - b[1].score)
+                    .slice(0, 3);
+                
+                return weakestAreas.map(([key, data]) => ({
+                    pillar: data.name,
+                    priority: data.score < 3 ? 'HIGH' : 'MEDIUM',
+                    description: getImprovementTip(key)
+                }));
+            };
+
+            const getImprovementTip = (pillar) => {
+                const tips = {
+                    discipline: "Start with one small habit and practice it daily for 30 days",
+                    education: "Replace 30 minutes of entertainment with learning each day",
+                    control: "Practice the 24-hour rule before making important decisions",
+                    awareness: "Spend 10 minutes each evening reflecting on your day",
+                    improvement: "Actively seek feedback and act on it consistently",
+                    motivation: "Write down your personal 'why' for each major goal",
+                    projection: "Audit your appearance and communication style weekly",
+                    direction: "Define what success looks like for YOU, not others"
+                };
+                return tips[pillar] || "Focus on building this area consistently";
+            };
+
+            const handleSubmit = () => {
+                if (userInfo.name && userInfo.email) {
+                    setCurrentStep('results');
+                }
+            };
+
+            if (currentStep === 'intro') {
+                return (
+                    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+                        <div className="text-center mb-8">
+                            <GraduationCap className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+                            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                                Self Mastery School Assessment
+                            </h1>
+                            <p className="text-lg text-gray-600">
+                                Discover your current level across the 8 pillars of self mastery
+                            </p>
+                        </div>
+
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+                            <h3 className="font-semibold text-blue-800 mb-3">What You'll Get:</h3>
+                            <ul className="space-y-2 text-blue-700">
+                                <li className="flex items-center gap-2">
+                                    <Award size={16} />
+                                    Letter grades for each of the 8 pillars
+                                </li>
+                                <li className="flex items-center gap-2">
+                                    <Target size={16} />
+                                    Your overall Self Mastery GPA
+                                </li>
+                                <li className="flex items-center gap-2">
+                                    <BookOpen size={16} />
+                                    Personalized learning path prioritized by your weakest areas
+                                </li>
+                                <li className="flex items-center gap-2">
+                                    <Download size={16} />
+                                    FREE "Self Mastery Action Plan" e-book
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div className="text-center">
+                            <button
+                                onClick={() => setCurrentStep('assessment')}
+                                className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors"
+                            >
+                                Start Assessment
+                            </button>
+                            <p className="text-sm text-gray-500 mt-2">Takes about 5 minutes</p>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (currentStep === 'assessment') {
+                const progress = ((currentQuestion + 1) / questions.length) * 100;
+                const currentQ = questions[currentQuestion];
+
+                return (
+                    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+                        <div className="mb-6">
+                            <div className="flex justify-between items-center mb-2">
+                                <h2 className="text-xl font-bold text-gray-800">Self Mastery Assessment</h2>
+                                <span className="text-sm text-gray-500">
+                                    {currentQuestion + 1} of {questions.length}
+                                </span>
+                            </div>
+                            
+                            <div className="w-full bg-gray-200 rounded-full h-3">
+                                <div 
+                                    className="bg-blue-600 h-3 rounded-full transition-all duration-300"
+                                    style={{ width: `${progress}%` }}
+                                ></div>
+                            </div>
+                            
+                            <div className="text-xs text-gray-500 mt-1 capitalize">
+                                Current Focus: {currentQ.pillar.replace(/([A-Z])/g, ' $1').trim()}
+                            </div>
+                        </div>
+
+                        <div className="mb-8">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-6">
+                                {currentQ.question}
+                            </h3>
+
+                            <div className="space-y-3">
+                                {currentQ.options.map((option, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => handleAnswer(option.value)}
+                                        className="w-full text-left p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
+                                    >
+                                        <span className="text-gray-700">{option.text}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (currentStep === 'info') {
+                return (
+                    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+                        <div className="text-center mb-6">
+                            <Mail className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+                            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                                Get Your Personalized Results
+                            </h2>
+                            <p className="text-gray-600">
+                                Enter your info to receive your Self Mastery School Report + FREE Action Plan e-book
+                            </p>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    First Name *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={userInfo.name}
+                                    onChange={(e) => setUserInfo({...userInfo, name: e.target.value})}
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                                    placeholder="Your first name"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Email Address *
+                                </label>
+                                <input
+                                    type="email"
+                                    value={userInfo.email}
+                                    onChange={(e) => setUserInfo({...userInfo, email: e.target.value})}
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                                    placeholder="your@email.com"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Age Range
+                                </label>
+                                <select
+                                    value={userInfo.age}
+                                    onChange={(e) => setUserInfo({...userInfo, age: e.target.value})}
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                                >
+                                    <option value="">Select age range</option>
+                                    <option value="18-22">18-22</option>
+                                    <option value="23-27">23-27</option>
+                                    <option value="28-32">28-32</option>
+                                    <option value="33+">33+</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    What's your biggest goal right now?
+                                </label>
+                                <input
+                                    type="text"
+                                    value={userInfo.currentGoal}
+                                    onChange={(e) => setUserInfo({...userInfo, currentGoal: e.target.value})}
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                                    placeholder="e.g., Start a business, get promoted, build better habits"
+                                />
+                            </div>
+
+                            <button
+                                onClick={handleSubmit}
+                                disabled={!userInfo.name || !userInfo.email}
+                                className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                            >
+                                Get My Results & Free E-Book
+                            </button>
+
+                            <p className="text-xs text-gray-500 text-center">
+                                We respect your privacy. Unsubscribe anytime.
+                            </p>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (currentStep === 'results') {
+                const { grades, overallGPA } = calculateGrades();
+                const learningPath = getPersonalizedPath();
+                
+                const getGPALevel = (gpa) => {
+                    if (gpa >= 4.0) return { level: "DEAN'S LIST", color: "text-green-600", icon: Award };
+                    if (gpa >= 3.5) return { level: "HONOR ROLL", color: "text-blue-600", icon: TrendingUp };
+                    if (gpa >= 2.5) return { level: "GOOD STANDING", color: "text-yellow-600", icon: BookOpen };
+                    return { level: "ACADEMIC PROBATION", color: "text-red-600", icon: AlertTriangle };
+                };
+
+                const gpaLevel = getGPALevel(overallGPA);
+                const IconComponent = gpaLevel.icon;
+
+                return (
+                    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+                        <div className="text-center mb-8">
+                            <IconComponent className={`w-16 h-16 ${gpaLevel.color} mx-auto mb-4`} />
+                            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                                Your Self Mastery School Report
+                            </h1>
+                            <div className={`text-2xl font-bold ${gpaLevel.color} mb-2`}>
+                                Overall GPA: {overallGPA}
+                            </div>
+                            <div className={`text-lg ${gpaLevel.color} font-semibold`}>
+                                {gpaLevel.level}
+                            </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-6 mb-8">
+                            <div>
+                                <h3 className="text-xl font-bold text-gray-800 mb-4">Your Grades</h3>
+                                <div className="space-y-3">
+                                    {Object.values(grades).map((grade, index) => (
+                                        <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                            <span className="font-medium text-gray-700">{grade.name}</span>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm text-gray-500">{grade.percentage}%</span>
+                                                <span className={`font-bold text-lg ${
+                                                    grade.letter === 'A' ? 'text-green-600' :
+                                                    grade.letter === 'B' ? 'text-blue-600' :
+                                                    grade.letter === 'C' ? 'text-yellow-600' :
+                                                    'text-red-600'
+                                                }`}>
+                                                    {grade.letter}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 className="text-xl font-bold text-gray-800 mb-4">Your Learning Path</h3>
+                                <p className="text-gray-600 mb-4">
+                                    Focus on these areas first, {userInfo.name}:
+                                </p>
+                                <div className="space-y-4">
+                                    {learningPath.map((item, index) => (
+                                        <div key={index} className="border-l-4 border-blue-500 pl-4">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <span className="font-semibold text-gray-800">{item.pillar}</span>
+                                                <span className={`text-xs px-2 py-1 rounded ${
+                                                    item.priority === 'HIGH' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
+                                                }`}>
+                                                    {item.priority} PRIORITY
+                                                </span>
+                                            </div>
+                                            <p className="text-sm text-gray-600">{item.description}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+                            <h3 className="text-xl font-bold text-blue-800 mb-2">
+                                Ready to Transform Your Potential Into Power?
+                            </h3>
+                            <p className="text-blue-700 mb-4">
+                                Check your email for your personalized Self Mastery Action Plan e-book and start your journey today.
+                            </p>
+                            <button
+                                onClick={() => window.location.reload()}
+                                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                            >
+                                Take Assessment Again
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            return null;
+        };
+
+        ReactDOM.render(<SelfMasteryAssessment />, document.getElementById('root'));
+    </script>
+</body>
+</html>
