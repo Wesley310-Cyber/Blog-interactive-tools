@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Discipline Check</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+        const { Target, TrendingUp, AlertTriangle, ArrowRight, BarChart3 } = lucide;
+
+        const MiniDisciplineAssessment = () => {
+            const [currentQuestion, setCurrentQuestion] = useState(0);
+            const [answers, setAnswers] = useState([]);
+            const [showResults, setShowResults] = useState(false);
+
+            const questions = [
+                {
+                    question: "When your alarm goes off in the morning, you typically:",
+                    options: [
+                        { text: "Get up immediately, every time", value: 4 },
+                        { text: "Get up within 5 minutes", value: 3 },
+                        { text: "Hit snooze once or twice", value: 2 },
+                        { text: "Struggle to get out of bed", value: 1 }
+                    ]
+                },
+                {
+                    question: "How often do you follow through on commitments you make to yourself?",
+                    options: [
+                        { text: "Always - my word to myself is sacred", value: 4 },
+                        { text: "Usually - I follow through most of the time", value: 3 },
+                        { text: "Sometimes - I'm inconsistent", value: 2 },
+                        { text: "Rarely - I struggle with self-commitment", value: 1 }
+                    ]
+                },
+                {
+                    question: "When you don't feel like doing something important, you:",
+                    options: [
+                        { text: "Do it anyway - feelings don't control my actions", value: 4 },
+                        { text: "Push through most of the time", value: 3 },
+                        { text: "Sometimes procrastinate but eventually do it", value: 2 },
+                        { text: "Often avoid it or make excuses", value: 1 }
+                    ]
+                },
+                {
+                    question: "How consistent are you with your daily routines?",
+                    options: [
+                        { text: "Very consistent - I stick to my schedule", value: 4 },
+                        { text: "Mostly consistent with some flexibility", value: 3 },
+                        { text: "Inconsistent - my routine changes often", value: 2 },
+                        { text: "I don't really have consistent routines", value: 1 }
+                    ]
+                }
+            ];
+
+            const handleAnswer = (value) => {
+                const newAnswers = [...answers, value];
+                setAnswers(newAnswers);
+
+                if (currentQuestion < questions.length - 1) {
+                    setCurrentQuestion(currentQuestion + 1);
+                } else {
+                    setShowResults(true);
+                }
+            };
+
+            const calculateScore = () => {
+                const total = answers.reduce((sum, answer) => sum + answer, 0);
+                const percentage = Math.round((total / 16) * 100);
+                return { total, percentage };
+            };
+
+            const getResultData = () => {
+                const { total, percentage } = calculateScore();
+
+                if (total >= 14) {
+                    return {
+                        level: "DISCIPLINE MASTER",
+                        color: "text-green-600",
+                        bgColor: "bg-green-50",
+                        borderColor: "border-green-300",
+                        icon: Target,
+                        message: "Outstanding! Your self-discipline is already strong.",
+                        insight: "You're in the top 10% when it comes to self-discipline. But how do you stack up across ALL 8 pillars of self-mastery?",
+                        cta: "See Your Complete Profile"
+                    };
+                } else if (total >= 11) {
+                    return {
+                        level: "BUILDING MOMENTUM",
+                        color: "text-blue-600",
+                        bgColor: "bg-blue-50",
+                        borderColor: "border-blue-300",
+                        icon: TrendingUp,
+                        message: "Good foundation! You have solid discipline with room to grow.",
+                        insight: "Self-discipline is just 1 of 8 pillars. Strengthening the others could unlock even more potential.",
+                        cta: "Discover Your Weak Spots"
+                    };
+                } else if (total >= 8) {
+                    return {
+                        level: "INCONSISTENT",
+                        color: "text-yellow-600",
+                        bgColor: "bg-yellow-50",
+                        borderColor: "border-yellow-300",
+                        icon: BarChart3,
+                        message: "Mixed results. Your discipline varies by situation.",
+                        insight: "Discipline struggles often connect to other areas like self-awareness and self-control. Want to see the full picture?",
+                        cta: "Find What's Holding You Back"
+                    };
+                } else {
+                    return {
+                        level: "NEEDS WORK",
+                        color: "text-red-600",
+                        bgColor: "bg-red-50",
+                        borderColor: "border-red-300",
+                        icon: AlertTriangle,
+                        message: "Your discipline needs serious attention.",
+                        insight: "The good news? Discipline is learnable. The complete assessment shows exactly where to start.",
+                        cta: "Get Your Action Plan"
+                    };
+                }
+            };
+
+            const resetAssessment = () => {
+                setCurrentQuestion(0);
+                setAnswers([]);
+                setShowResults(false);
+            };
+
+            if (showResults) {
+                const result = getResultData();
+                const { percentage } = calculateScore();
+                const IconComponent = result.icon;
+
+                return (
+                    <div className="max-w-2xl mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <div className={`${result.bgColor} ${result.borderColor} border rounded-lg p-6`}>
+                            <div className="flex items-center gap-3 mb-4">
+                                <IconComponent className={`${result.color} w-8 h-8`} />
+                                <div>
+                                    <div className={`${result.color} text-2xl font-bold`}>
+                                        {percentage}% DISCIPLINE SCORE
+                                    </div>
+                                    <div className={`${result.color} text-lg font-semibold`}>
+                                        {result.level}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p className="text-gray-700 text-lg mb-4">
+                                {result.message}
+                            </p>
+
+                            <div className="bg-white rounded-lg p-4 mb-6 border border-gray-200">
+                                <p className="text-gray-700 font-medium mb-3">
+                                    💡 <strong>Key Insight:</strong>
+                                </p>
+                                <p className="text-gray-600">
+                                    {result.insight}
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row gap-3">
+                                <button
+                                    onClick={() => window.open('./self-mastery-assessment.html', '_blank')}
+                                    className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                                >
+                                    {result.cta}
+                                    <ArrowRight size={16} />
+                                </button>
+                                
+                                <button
+                                    onClick={resetAssessment}
+                                    className="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                >
+                                    Retake
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="mt-4 text-center">
+                            <p className="text-sm text-gray-500">
+                                This is just 1 of 8 pillars in the complete Self Mastery School framework
+                            </p>
+                        </div>
+                    </div>
+                );
+            }
+
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+
+            return (
+                <div className="max-w-2xl mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+                    <div className="text-center mb-6">
+                        <div className="flex items-center justify-center gap-2 mb-2">
+                            <Target className="w-6 h-6 text-blue-600" />
+                            <h3 className="text-xl font-bold text-gray-800">
+                                Quick Discipline Check
+                            </h3>
+                        </div>
+                        <p className="text-gray-600">
+                            How's your self-discipline really? 4 quick questions.
+                        </p>
+                    </div>
+
+                    <div className="mb-6">
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm text-gray-500">
+                                Question {currentQuestion + 1} of {questions.length}
+                            </span>
+                            <span className="text-sm font-semibold text-blue-600">
+                                {Math.round(progress)}%
+                            </span>
+                        </div>
+                        
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${progress}%` }}
+                            ></div>
+                        </div>
+                    </div>
+
+                    <div className="mb-8">
+                        <h4 className="text-lg font-semibold text-gray-800 mb-6">
+                            {questions[currentQuestion].question}
+                        </h4>
+
+                        <div className="space-y-3">
+                            {questions[currentQuestion].options.map((option, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => handleAnswer(option.value)}
+                                    className="w-full text-left p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
+                                >
+                                    <span className="text-gray-700">{option.text}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="text-center text-xs text-gray-500">
+                        Part of the Self Mastery School framework
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<MiniDisciplineAssessment />, document.getElementById('root'));
+    </script>
+</body>
+</html>
